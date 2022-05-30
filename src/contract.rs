@@ -1,4 +1,6 @@
-use cosmwasm_std::{entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Order};
+use cosmwasm_std::{entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Record, Response, StdResult, Order};
+use cw_storage_plus::Map;
+use schemars::_serde_json::Value::Null;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, GreetingsResponse, InstantiateMsg, QueryMsg};
@@ -49,8 +51,16 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 }
 
 fn query_greetings(deps: Deps) -> StdResult<GreetingsResponse> {
-    let greetings: StdResult<Vec<_>> = GREETINGS.range(deps.storage, None, None, Order::Ascending).collect();
-    Ok(GreetingsResponse { greetings: greetings.unwrap() })
+    // let greetings: StdResult<Vec<_>> = GREETINGS.range(deps.storage, None, None, Order::Ascending).map(|v| {
+    //     let value = v.unwrap();
+    //     return Record(value.0.to_string(), value.1);
+    // }).collect();
+    let greetings: Vec<_> = GREETINGS.range(deps.storage, None, None, Order::Ascending).map(|v| {
+        let value = v.unwrap();
+        (value.0.as_bytes().to_vec(), value.1)
+    }).collect();
+    // let greetings: StdResult<Vec<Record>> = GREETINGS.range(deps.storage, None, None, Order::Ascending).collect();
+    Ok(GreetingsResponse { greetings })
 }
 
 #[cfg(test)]

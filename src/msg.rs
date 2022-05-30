@@ -1,4 +1,5 @@
-use cosmwasm_std::Pair;
+use cosmwasm_std::{Addr, Record};
+use cw_storage_plus::Map;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -21,7 +22,7 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct GreetingsResponse {
-    pub greetings: Vec<Pair<String>>,
+    pub greetings: Vec<Record<String>>,
 }
 
 // We define a custom struct for each query response
